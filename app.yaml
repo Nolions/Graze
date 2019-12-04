@@ -1,0 +1,6 @@
+runtime: go112
+main: ./cmd
+
+handlers:
+- url: /.*
+  script: auto
