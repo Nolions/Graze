@@ -8,8 +8,10 @@ import (
 )
 
 type AppConfig struct {
-	Debug bool
-	Port  string
+	Debug              bool
+	Port               string
+	DatastoreProjectId string
+	DatastoreHost      string
 }
 
 var Conf AppConfig
@@ -24,6 +26,8 @@ func init() {
 func Load() {
 	Conf.Port = getEnv("APP_PORT", "8080")
 	Conf.Debug = getEnvBool("APP_DEBUG", false)
+	Conf.DatastoreProjectId = getEnv("DATASTORE_PROJECT_ID", "test-demo")
+	Conf.DatastoreHost = getEnv("DATASTORE_HOST", "http://localhost:8081")
 }
 
 func getEnv(key, defaultVal string) string {

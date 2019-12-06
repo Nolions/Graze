@@ -1,5 +1,6 @@
-ProjectID=
+ProjectID= web-todo-list
 Path=${PWD}
+DstastoreHostPort=8432
 
 
 # run & build
@@ -12,11 +13,10 @@ app-build:
 # Google App Engin
 # emulators
 # run data store emulators
-gae-emulators-datastore:
-	gcloud beta emulators datastore start --data-dir=${Path}
+gae-datastore:
+	gcloud beta emulators datastore  start --data-dir=${Path}
 
 # Set ProjectID
-ProjectID=
 gae-set-ProjectID:
 	gcloud config set project ${ProjectID}
 

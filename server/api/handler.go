@@ -1,53 +1,43 @@
-package server
+package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
+	"graze/config"
+	"graze/models"
 	"net/http"
 	"time"
 )
 
 type Event struct {
-	Title    string    `json:"title"`
-	Describe string    `json:"describe"`
-	Deadline time.Time `json:"deadline"`
-}
-
-//
-type ResponseEvent struct {
-	Event
+	models.Event
 	Uid      string    `json:"uid"`
 	CreateAt time.Time `json:"create_at"`
 }
 
-var events = make(map[string]ResponseEvent)
-
-func new() Event {
-	return Event{
-		Title:    "",
-		Describe: "",
-		Deadline: time.Time{},
-	}
-}
+var events = make(map[string]Event)
 
 func ListHandler(c *gin.Context) {
+	c.String(http.StatusOK, "aa")
+	c.String(http.StatusOK, config.Conf.DatastoreHost)
 	c.JSON(http.StatusOK, convertList())
 }
 
 func CreatorHandler(c *gin.Context) {
-	e := new()
+	e := new(Event)
 	c.BindJSON(&e)
 
-	uid := uuid.Must(uuid.NewV4()).String()
-	events[uid] = ResponseEvent{
-		Event: Event{
-			Title:    e.Title,
-			Describe: e.Describe,
-			Deadline: e.Deadline,
-		},
-		Uid:      uid,
-		CreateAt: time.Now(),
+	event := models.New()
+	event.Title = e.Title
+	event.Describe = e.Describe
+	event.Deadline = e.Deadline
+	if !event.Store() {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    1005001,
+			"message": "Store Error.",
+		})
+		return
 	}
+
 
 	c.JSON(http.StatusOK, convertList())
 }
@@ -69,12 +59,12 @@ func EditHandler(c *gin.Context) {
 		noDataFound(c)
 	}
 
-	re := new()
+	re := new(Event)
 	c.BindJSON(&re)
 	e := events[uid]
 	e.Title = re.Title
 	e.Describe = re.Describe
-	e.Deadline = re.Deadline
+	//e.Deadline = re.Deadline
 	events[uid] = e
 
 	c.JSON(http.StatusOK, convertList())
@@ -88,12 +78,12 @@ func noDataFound(c *gin.Context) {
 	return
 }
 
-func convertList() []ResponseEvent {
+func convertList() []Event {
 	if len(events) <= 0 {
-		return make([]ResponseEvent, 0)
+		return make([]Event, 0)
 	}
 
-	var list []ResponseEvent
+	var list []Event
 	for _, a := range events {
 		list = append(list, a)
 	}

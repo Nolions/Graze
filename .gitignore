@@ -183,3 +183,4 @@ $RECYCLE.BIN/
 .idea/Graze.iml
 .idea/.gitignore
 .env
+WEB-INF/appengine-generated/local_db.bin
