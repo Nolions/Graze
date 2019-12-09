@@ -184,3 +184,5 @@ $RECYCLE.BIN/
 .idea/.gitignore
 .env
 WEB-INF/appengine-generated/local_db.bin
+env.yaml
+WEB-INF/index.yaml

@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"graze/config"
 	"graze/models"
 	"net/http"
 	"time"
@@ -17,9 +16,7 @@ type Event struct {
 var events = make(map[string]Event)
 
 func ListHandler(c *gin.Context) {
-	c.String(http.StatusOK, "aa")
-	c.String(http.StatusOK, config.Conf.DatastoreHost)
-	c.JSON(http.StatusOK, convertList())
+	c.JSON(http.StatusOK, new(Event).All())
 }
 
 func CreatorHandler(c *gin.Context) {
@@ -30,7 +27,7 @@ func CreatorHandler(c *gin.Context) {
 	event.Title = e.Title
 	event.Describe = e.Describe
 	event.Deadline = e.Deadline
-	if !event.Store() {
+	if !event.Creator() {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    1005001,
 			"message": "Store Error.",
@@ -38,19 +35,17 @@ func CreatorHandler(c *gin.Context) {
 		return
 	}
 
-
 	c.JSON(http.StatusOK, convertList())
 }
 
 func DeleteHandler(c *gin.Context) {
 	uid := c.Param("uid")
-	if _, ok := events[uid]; !ok {
-		noDataFound(c)
-	}
 
-	delete(events, uid)
+	var e  = new(models.Event)
+	e.Uid = uid
+	e.Delete()
 
-	c.JSON(http.StatusOK, convertList())
+	c.JSON(http.StatusNoContent, nil)
 }
 
 func EditHandler(c *gin.Context) {
