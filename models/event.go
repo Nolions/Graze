@@ -9,7 +9,9 @@ import (
 	"time"
 )
 
-type Event struct {
+const EntityIncident = "Incident"
+
+type Incident struct {
 	Uid      string    `json:"uid"`
 	Title    string    `json:"title"`
 	Describe string    `json:"describe"`
@@ -17,8 +19,8 @@ type Event struct {
 	CrateAt  time.Time `json:"crate_at"`
 }
 
-func New() Event {
-	return Event{
+func New() Incident {
+	return Incident{
 		Uid:      uuid.Must(uuid.NewV4()).String(),
 		Title:    "",
 		Describe: "",
@@ -28,15 +30,15 @@ func New() Event {
 }
 
 // 新增事件
-func (e *Event) Creator() bool {
+func (e *Incident) Creator() bool {
 	d := new(pkg.Datastore)
 	d.Client()
 
-	k := datastore.NameKey("Event", e.Uid, nil)
+	k := datastore.NameKey(EntityIncident, e.Uid, nil)
 
 	_, err := d.Conn.Put(d.Ctx, k, e)
 	if err != nil {
-		log.Println(err)
+		// TODO Handle error.
 		return false
 	}
 
@@ -44,21 +46,21 @@ func (e *Event) Creator() bool {
 }
 
 // 取得所有事件
-func (e *Event) All() []Event {
+func (e *Incident) All() []Incident {
 	d := new(pkg.Datastore)
 	d.Client()
 
-	query := datastore.NewQuery("Event")
+	query := datastore.NewQuery(EntityIncident)
 	it := d.Conn.Run(d.Ctx, query)
 
-	var list []Event
+	var list []Incident
 	for {
-		var e Event
+		var e Incident
 		_, err := it.Next(&e)
 		if err == iterator.Done {
 			break
 		} else if err != nil {
-			// TODO
+			// TODO Handle error.
 		}
 
 		list = append(list, e)
@@ -67,20 +69,19 @@ func (e *Event) All() []Event {
 }
 
 // 刪除事件
-func (e *Event) Delete() bool {
+func (e *Incident) Delete() bool {
 	d := new(pkg.Datastore)
 	d.Client()
 
-	query := datastore.NewQuery("Event").Filter("Uid = ", e.Uid)
+	query := datastore.NewQuery(EntityIncident).Filter("Uid = ", e.Uid)
 	it := d.Conn.Run(d.Ctx, query)
 	for {
-		var e Event
+		var e Incident
 		k, err := it.Next(&e)
 		if err == iterator.Done {
 			break
 		} else if err != nil {
-			// TODO
-			log.Fatal(err)
+			// TODO Handle error.
 			return false
 		}
 
@@ -88,8 +89,7 @@ func (e *Event) Delete() bool {
 		log.Println(k)
 		err = d.Conn.Delete(d.Ctx, k)
 		if err != nil {
-			// TODO
-			log.Fatal(err)
+			// TODO Handle error.
 			return false
 		}
 	}
@@ -97,15 +97,12 @@ func (e *Event) Delete() bool {
 	return true
 }
 
-func (e *Event) Edit() bool {
+func (e *Incident) Edit() bool {
 	d := new(pkg.Datastore)
 	d.Client()
-	//log.Println(e.Uid)
-	//query := datastore.NewQuery("Event").Filter("Uid = ", e.Uid)
-	//it := d.Conn.Run(d.Ctx, query)
 
-	k := datastore.NameKey("Entity", e.Uid, nil)
-	event := new(Event)
+	k := datastore.NameKey(EntityIncident, e.Uid, nil)
+	event := new(Incident)
 	d.Conn.Get(d.Ctx, k, event)
 
 	if err := d.Conn.Get(d.Ctx, k, e); err != nil {

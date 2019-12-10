@@ -8,7 +8,7 @@ import (
 )
 
 type Event struct {
-	models.Event
+	models.Incident
 	Uid      string    `json:"uid"`
 	CreateAt time.Time `json:"create_at"`
 }
