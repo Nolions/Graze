@@ -2,8 +2,6 @@ runtime: go112
 main: ./cmd
 env_variables:
   APP_DEBUG: false
-#  DATASTORE
-  DATASTORE_PROJECT_ID: "web-todo-list"
 
 service: api
 
