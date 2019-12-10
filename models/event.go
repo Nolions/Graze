@@ -32,9 +32,9 @@ func (e *Event) Creator() bool {
 	d := new(pkg.Datastore)
 	d.Client()
 
-	key := datastore.IncompleteKey("Event", nil)
+	k := datastore.NameKey("Event", e.Uid, nil)
 
-	_, err := d.Conn.Put(d.Ctx, key, e)
+	_, err := d.Conn.Put(d.Ctx, k, e)
 	if err != nil {
 		log.Println(err)
 		return false
@@ -100,31 +100,26 @@ func (e *Event) Delete() bool {
 func (e *Event) Edit() bool {
 	d := new(pkg.Datastore)
 	d.Client()
-	log.Println(e.Uid)
-	query := datastore.NewQuery("Event").Filter("Uid = ", e.Uid)
-	it := d.Conn.Run(d.Ctx, query)
-	for {
+	//log.Println(e.Uid)
+	//query := datastore.NewQuery("Event").Filter("Uid = ", e.Uid)
+	//it := d.Conn.Run(d.Ctx, query)
 
-		var event Event
-		k, err := it.Next(&event)
-		if err == iterator.Done {
-			break
-		} else if err != nil {
-			// TODO
-			log.Fatal(err)
-			return false
-		}
+	k := datastore.NameKey("Entity", e.Uid, nil)
+	event := new(Event)
+	d.Conn.Get(d.Ctx, k, event)
 
-		event.Title = e.Title
-		event.Describe = e.Describe
-		event.Deadline = e.Deadline
+	if err := d.Conn.Get(d.Ctx, k, e); err != nil {
+		// TODO Handle error.
+		return false
+	}
 
-		_, err = d.Conn.Put(d.Ctx, k, e)
-		if err != nil {
-			// TODO
-			log.Fatal(err)
-			return false
-		}
+	event.Title = e.Title
+	event.Describe = e.Describe
+	event.Deadline = e.Deadline
+
+	if _, err := d.Conn.Put(d.Ctx, k, event); err != nil {
+		// TODO Handle error.
+		return false
 	}
 
 	return true
