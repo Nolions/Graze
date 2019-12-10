@@ -2,11 +2,9 @@ package models
 
 import (
 	"cloud.google.com/go/datastore"
-	"context"
 	"github.com/gofrs/uuid"
 	"google.golang.org/api/iterator"
-	"google.golang.org/api/option"
-	"google.golang.org/grpc"
+	"graze/pkg"
 	"log"
 	"time"
 )
@@ -16,7 +14,7 @@ type Event struct {
 	Title    string    `json:"title"`
 	Describe string    `json:"describe"`
 	Deadline time.Time `json:"deadline"`
-	CrateAt time.Time `json:"crate_at"`
+	CrateAt  time.Time `json:"crate_at"`
 }
 
 func New() Event {
@@ -25,37 +23,18 @@ func New() Event {
 		Title:    "",
 		Describe: "",
 		Deadline: time.Time{},
-		CrateAt:time.Now(),
+		CrateAt:  time.Now(),
 	}
 }
 
-const (
-	projectId    = "web-todo-list"
-	namespace    = "Entity"
-	kind         = "Entity"
-	emulatorHost = "localhost:8081"
-)
-
 // 新增事件
-func (e *Event)Creator() bool {
-	o := []option.ClientOption{
-		option.WithEndpoint(emulatorHost),
-		option.WithoutAuthentication(),
-		option.WithGRPCDialOption(grpc.WithInsecure()),
-		option.WithGRPCConnectionPool(50),
-	}
-
-	ctx := context.Background()
-
-	dsClient, err := datastore.NewClient(ctx, projectId, o...)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
+func (e *Event) Creator() bool {
+	d := new(pkg.Datastore)
+	d.Client()
 
 	key := datastore.IncompleteKey("Event", nil)
 
-	_, err = dsClient.Put(ctx, key, e)
+	_, err := d.Conn.Put(d.Ctx, key, e)
 	if err != nil {
 		log.Println(err)
 		return false
@@ -66,27 +45,15 @@ func (e *Event)Creator() bool {
 
 // 取得所有事件
 func (e *Event) All() []Event {
-	o := []option.ClientOption{
-		option.WithEndpoint(emulatorHost),
-		option.WithoutAuthentication(),
-		option.WithGRPCDialOption(grpc.WithInsecure()),
-		option.WithGRPCConnectionPool(50),
-	}
-
-	ctx := context.Background()
-
-	dsClient, err := datastore.NewClient(ctx, projectId, o...)
-	if err != nil {
-		// TODO
-		return []Event{}
-	}
+	d := new(pkg.Datastore)
+	d.Client()
 
 	query := datastore.NewQuery("Event")
-	it := dsClient.Run(ctx, query)
+	it := d.Conn.Run(d.Ctx, query)
 
 	var list []Event
 	for {
-		var e  Event
+		var e Event
 		_, err := it.Next(&e)
 		if err == iterator.Done {
 			break
@@ -100,28 +67,14 @@ func (e *Event) All() []Event {
 }
 
 // 刪除事件
-func (e *Event) Delete()bool  {
-	o := []option.ClientOption{
-		option.WithEndpoint(emulatorHost),
-		option.WithoutAuthentication(),
-		option.WithGRPCDialOption(grpc.WithInsecure()),
-		option.WithGRPCConnectionPool(50),
-	}
-
-	ctx := context.Background()
-
-	dsClient, err := datastore.NewClient(ctx, projectId, o...)
-	if err != nil {
-		// TODO
-		log.Fatal(err)
-		return false
-	}
-	log.Println(&e.Uid)
+func (e *Event) Delete() bool {
+	d := new(pkg.Datastore)
+	d.Client()
 
 	query := datastore.NewQuery("Event").Filter("Uid = ", e.Uid)
-	it := dsClient.Run(ctx, query)
+	it := d.Conn.Run(d.Ctx, query)
 	for {
-		var e  Event
+		var e Event
 		k, err := it.Next(&e)
 		if err == iterator.Done {
 			log.Println("aa")
@@ -134,7 +87,7 @@ func (e *Event) Delete()bool  {
 
 		log.Println(e)
 		log.Println(k)
-		err = dsClient.Delete(ctx, k)
+		err = d.Conn.Delete(d.Ctx, k)
 		if err != nil {
 			// TODO
 			log.Fatal(err)

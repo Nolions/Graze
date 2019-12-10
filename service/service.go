@@ -1,9 +1,9 @@
-package server
+package service
 
 import (
 	"github.com/gin-gonic/gin"
 	"graze/config"
-	"graze/server/api"
+	"graze/service/api"
 	"log"
 	"net/http"
 	"strconv"

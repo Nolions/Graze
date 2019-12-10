@@ -41,7 +41,7 @@ func CreatorHandler(c *gin.Context) {
 func DeleteHandler(c *gin.Context) {
 	uid := c.Param("uid")
 
-	var e  = new(models.Event)
+	var e = new(models.Event)
 	e.Uid = uid
 	e.Delete()
 

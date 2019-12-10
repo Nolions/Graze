@@ -1,4 +1,4 @@
-package server
+package service
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,6 @@ import (
 
 func Engine() *gin.Engine {
 	e := &gin.Engine{}
-
 	if !config.Conf.Debug {
 		gin.SetMode(gin.DebugMode)
 		e = gin.Default()

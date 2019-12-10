@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"graze/config"
-	"graze/server"
+	"graze/service"
 	"log"
 	"net/http"
 	"os"
@@ -14,12 +14,11 @@ import (
 func main() {
 	config.Load()
 
-	e := server.Engine()
-	
-	server.Handler(e)
-	s := server.New(e, fmt.Sprintf(":%s", config.Conf.Port))
+	e := service.Engine()
+	service.Handler(e)
+	s := service.New(e, fmt.Sprintf(":%s", config.Conf.Port))
 	go signalProcess(s)
-	server.Run(s)
+	service.Run(s)
 }
 
 func signalProcess(srv *http.Server) {
