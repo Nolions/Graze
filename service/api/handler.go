@@ -16,7 +16,12 @@ type Event struct {
 var events = make(map[string]Event)
 
 func ListHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, new(Event).All())
+	list := new(Event).All()
+	if len(list) > 0 {
+		c.JSON(http.StatusOK, new(Event).All())
+	} else {
+		c.JSON(http.StatusOK, gin.H{})
+	}
 }
 
 func CreatorHandler(c *gin.Context) {
@@ -35,7 +40,7 @@ func CreatorHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, convertList())
+	c.JSON(http.StatusNoContent, nil)
 }
 
 func DeleteHandler(c *gin.Context) {
@@ -62,7 +67,7 @@ func EditHandler(c *gin.Context) {
 	//e.Deadline = re.Deadline
 	events[uid] = e
 
-	c.JSON(http.StatusOK, convertList())
+	c.JSON(http.StatusNoContent, nil)
 }
 
 func noDataFound(c *gin.Context) {
@@ -71,16 +76,4 @@ func noDataFound(c *gin.Context) {
 		"message": "No Data Found.",
 	})
 	return
-}
-
-func convertList() []Event {
-	if len(events) <= 0 {
-		return make([]Event, 0)
-	}
-
-	var list []Event
-	for _, a := range events {
-		list = append(list, a)
-	}
-	return list
 }
