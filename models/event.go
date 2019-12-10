@@ -77,7 +77,6 @@ func (e *Event) Delete() bool {
 		var e Event
 		k, err := it.Next(&e)
 		if err == iterator.Done {
-			log.Println("aa")
 			break
 		} else if err != nil {
 			// TODO
@@ -88,6 +87,39 @@ func (e *Event) Delete() bool {
 		log.Println(e)
 		log.Println(k)
 		err = d.Conn.Delete(d.Ctx, k)
+		if err != nil {
+			// TODO
+			log.Fatal(err)
+			return false
+		}
+	}
+
+	return true
+}
+
+func (e *Event) Edit() bool {
+	d := new(pkg.Datastore)
+	d.Client()
+	log.Println(e.Uid)
+	query := datastore.NewQuery("Event").Filter("Uid = ", e.Uid)
+	it := d.Conn.Run(d.Ctx, query)
+	for {
+
+		var event Event
+		k, err := it.Next(&event)
+		if err == iterator.Done {
+			break
+		} else if err != nil {
+			// TODO
+			log.Fatal(err)
+			return false
+		}
+
+		event.Title = e.Title
+		event.Describe = e.Describe
+		event.Deadline = e.Deadline
+
+		_, err = d.Conn.Put(d.Ctx, k, e)
 		if err != nil {
 			// TODO
 			log.Fatal(err)

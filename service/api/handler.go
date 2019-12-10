@@ -15,6 +15,7 @@ type Event struct {
 
 var events = make(map[string]Event)
 
+// 所有事件
 func ListHandler(c *gin.Context) {
 	list := new(Event).All()
 	if len(list) > 0 {
@@ -24,6 +25,7 @@ func ListHandler(c *gin.Context) {
 	}
 }
 
+// 新增事件
 func CreatorHandler(c *gin.Context) {
 	e := new(Event)
 	c.BindJSON(&e)
@@ -43,6 +45,7 @@ func CreatorHandler(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// 刪除事件
 func DeleteHandler(c *gin.Context) {
 	uid := c.Param("uid")
 
@@ -53,27 +56,16 @@ func DeleteHandler(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// 編輯事件
 func EditHandler(c *gin.Context) {
-	uid := c.Param("uid")
-	if _, ok := events[uid]; !ok {
-		noDataFound(c)
-	}
+	e := new(Event)
+	c.BindJSON(&e)
 
-	re := new(Event)
-	c.BindJSON(&re)
-	e := events[uid]
-	e.Title = re.Title
-	e.Describe = re.Describe
-	//e.Deadline = re.Deadline
-	events[uid] = e
-
+	var event = new(models.Event)
+	event.Uid = c.Param("uid")
+	event.Title = e.Title
+	event.Describe = e.Describe
+	event.Deadline = e.Deadline
+	event.Edit()
 	c.JSON(http.StatusNoContent, nil)
-}
-
-func noDataFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, gin.H{
-		"code":    1004041,
-		"message": "No Data Found.",
-	})
-	return
 }
