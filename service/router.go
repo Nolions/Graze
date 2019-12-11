@@ -1,4 +1,4 @@
-package api
+package service
 
 import (
 	"github.com/gin-gonic/gin"
@@ -55,4 +55,5 @@ func EditHandler(c *gin.Context) {
 	c.BindJSON(&e)
 
 	Client.EditIncident(c.Param("uid"), e.Title, e.Describe, e.Deadline)
+	c.JSON(http.StatusNoContent, nil)
 }

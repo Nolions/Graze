@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"graze/config"
 	"graze/models"
-	"graze/service/api"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,12 +21,12 @@ func New(r *gin.Engine, addr string) *http.Server {
 }
 
 func Handler(router *gin.Engine) {
-	api.Client = (new(models.Datastore)).NewClient()
+	Client = (new(models.Datastore)).NewClient()
 
-	router.GET("/", api.ListHandler)
-	router.POST("/", api.CreatorHandler)
-	router.DELETE("/:uid", api.DeleteHandler)
-	router.PUT("/:uid", api.EditHandler)
+	router.GET("/", ListHandler)
+	router.POST("/", incidentParams, CreatorHandler)
+	router.DELETE("/:uid", incidentUid, DeleteHandler)
+	router.PUT("/:uid", incidentUid, incidentParams, EditHandler)
 }
 
 func Run(s *http.Server) {
