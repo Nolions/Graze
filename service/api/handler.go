@@ -49,7 +49,7 @@ func CreatorHandler(c *gin.Context) {
 func DeleteHandler(c *gin.Context) {
 	uid := c.Param("uid")
 
-	var e = new(models.Event)
+	var e = new(models.Incident)
 	e.Uid = uid
 	e.Delete()
 
@@ -61,7 +61,7 @@ func EditHandler(c *gin.Context) {
 	e := new(Event)
 	c.BindJSON(&e)
 
-	var event = new(models.Event)
+	var event = new(models.Incident)
 	event.Uid = c.Param("uid")
 	event.Title = e.Title
 	event.Describe = e.Describe

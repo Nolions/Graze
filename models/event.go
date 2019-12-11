@@ -5,7 +5,6 @@ import (
 	"github.com/gofrs/uuid"
 	"google.golang.org/api/iterator"
 	"graze/pkg"
-	"log"
 	"time"
 )
 
@@ -73,25 +72,11 @@ func (e *Incident) Delete() bool {
 	d := new(pkg.Datastore)
 	d.Client()
 
-	query := datastore.NewQuery(EntityIncident).Filter("Uid = ", e.Uid)
-	it := d.Conn.Run(d.Ctx, query)
-	for {
-		var e Incident
-		k, err := it.Next(&e)
-		if err == iterator.Done {
-			break
-		} else if err != nil {
-			// TODO Handle error.
-			return false
-		}
-
-		log.Println(e)
-		log.Println(k)
-		err = d.Conn.Delete(d.Ctx, k)
-		if err != nil {
-			// TODO Handle error.
-			return false
-		}
+	k := datastore.NameKey(EntityIncident, e.Uid, nil)
+	err := d.Conn.Delete(d.Ctx, k)
+	if err != nil {
+		// TODO Handle error.
+		return false
 	}
 
 	return true
