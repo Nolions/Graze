@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"graze/config"
+	"graze/models"
 	"graze/service/api"
 	"log"
 	"net/http"
@@ -21,6 +22,8 @@ func New(r *gin.Engine, addr string) *http.Server {
 }
 
 func Handler(router *gin.Engine) {
+	api.Client = (new(models.Datastore)).NewClient()
+
 	router.GET("/", api.ListHandler)
 	router.POST("/", api.CreatorHandler)
 	router.DELETE("/:uid", api.DeleteHandler)

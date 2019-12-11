@@ -1,4 +1,4 @@
-package pkg
+package models
 
 import (
 	"cloud.google.com/go/datastore"
@@ -19,6 +19,13 @@ type Datastore struct {
 	err  error
 }
 
+func (*Datastore) NewClient() *Datastore {
+	d := new(Datastore)
+	d.Client()
+	return d
+}
+
+// 建立Google Datastroe 連線
 func (d *Datastore) Client() {
 	d.Ctx = context.Background()
 	if config.Conf.Debug {
@@ -37,4 +44,8 @@ func (d *Datastore) Client() {
 	if d.err != nil {
 		log.Println(d.err)
 	}
+}
+
+func (d *Datastore)setDatastroeKey(v, entityName string) *datastore.Key {
+	return datastore.NameKey(entityName, v, nil)
 }

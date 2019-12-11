@@ -4,11 +4,8 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/gofrs/uuid"
 	"google.golang.org/api/iterator"
-	"graze/pkg"
 	"time"
 )
-
-const EntityIncident = "Incident"
 
 type Incident struct {
 	Uid      string    `json:"uid"`
@@ -18,24 +15,20 @@ type Incident struct {
 	CrateAt  time.Time `json:"crate_at"`
 }
 
-func New() Incident {
-	return Incident{
-		Uid:      uuid.Must(uuid.NewV4()).String(),
-		Title:    "",
-		Describe: "",
-		Deadline: time.Time{},
-		CrateAt:  time.Now(),
-	}
+func (i *Incident) TableName() string {
+	return "Incident"
+}
+
+func (i *Incident) New() {
+	i.Uid = uuid.Must(uuid.NewV4()).String()
+	i.CrateAt = time.Now()
 }
 
 // 新增事件
-func (e *Incident) Creator() bool {
-	d := new(pkg.Datastore)
-	d.Client()
+func (d *Datastore) NewIncident(i *Incident) bool {
+	k := d.setDatastroeKey(i.Uid, new(Incident).TableName())
 
-	k := datastore.NameKey(EntityIncident, e.Uid, nil)
-
-	_, err := d.Conn.Put(d.Ctx, k, e)
+	_, err := d.Conn.Put(d.Ctx, k, i)
 	if err != nil {
 		// TODO Handle error.
 		return false
@@ -45,11 +38,8 @@ func (e *Incident) Creator() bool {
 }
 
 // 取得所有事件
-func (e *Incident) All() []Incident {
-	d := new(pkg.Datastore)
-	d.Client()
-
-	query := datastore.NewQuery(EntityIncident)
+func (d *Datastore) AllIncident() []Incident {
+	query := datastore.NewQuery(new(Incident).TableName())
 	it := d.Conn.Run(d.Ctx, query)
 
 	var list []Incident
@@ -68,11 +58,8 @@ func (e *Incident) All() []Incident {
 }
 
 // 刪除事件
-func (e *Incident) Delete() bool {
-	d := new(pkg.Datastore)
-	d.Client()
-
-	k := datastore.NameKey(EntityIncident, e.Uid, nil)
+func (d *Datastore) DeleteIncident(uid string) bool {
+	k := d.setDatastroeKey(uid, new(Incident).TableName())
 	err := d.Conn.Delete(d.Ctx, k)
 	if err != nil {
 		// TODO Handle error.
@@ -82,24 +69,21 @@ func (e *Incident) Delete() bool {
 	return true
 }
 
-func (e *Incident) Edit() bool {
-	d := new(pkg.Datastore)
-	d.Client()
+// 編輯事件
+func (d *Datastore) EditIncident(uid, title, describe string, deadline time.Time) bool {
+	k := d.setDatastroeKey(uid, new(Incident).TableName())
 
-	k := datastore.NameKey(EntityIncident, e.Uid, nil)
-	event := new(Incident)
-	d.Conn.Get(d.Ctx, k, event)
-
-	if err := d.Conn.Get(d.Ctx, k, e); err != nil {
+	i := new(Incident)
+	err := d.Conn.Get(d.Ctx, k, i)
+	if err != nil {
 		// TODO Handle error.
 		return false
 	}
+	i.Title = title
+	i.Describe = describe
+	i.Deadline = deadline
 
-	event.Title = e.Title
-	event.Describe = e.Describe
-	event.Deadline = e.Deadline
-
-	if _, err := d.Conn.Put(d.Ctx, k, event); err != nil {
+	if _, err := d.Conn.Put(d.Ctx, k, i); err != nil {
 		// TODO Handle error.
 		return false
 	}

@@ -13,13 +13,14 @@ type Event struct {
 	CreateAt time.Time `json:"create_at"`
 }
 
-var events = make(map[string]Event)
+var Client *models.Datastore
 
 // 所有事件
 func ListHandler(c *gin.Context) {
-	list := new(Event).All()
+	list := Client.AllIncident()
+
 	if len(list) > 0 {
-		c.JSON(http.StatusOK, new(Event).All())
+		c.JSON(http.StatusOK, list)
 	} else {
 		c.JSON(http.StatusOK, gin.H{})
 	}
@@ -30,28 +31,20 @@ func CreatorHandler(c *gin.Context) {
 	e := new(Event)
 	c.BindJSON(&e)
 
-	event := models.New()
-	event.Title = e.Title
-	event.Describe = e.Describe
-	event.Deadline = e.Deadline
-	if !event.Creator() {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    1005001,
-			"message": "Store Error.",
-		})
-		return
-	}
+	i := new(models.Incident)
+	i.New()
+	i.Title = e.Title
+	i.Describe = e.Describe
+	i.Deadline = e.Deadline
+
+	Client.NewIncident(i)
 
 	c.JSON(http.StatusNoContent, nil)
 }
 
 // 刪除事件
 func DeleteHandler(c *gin.Context) {
-	uid := c.Param("uid")
-
-	var e = new(models.Incident)
-	e.Uid = uid
-	e.Delete()
+	Client.DeleteIncident(c.Param("uid"))
 
 	c.JSON(http.StatusNoContent, nil)
 }
@@ -61,11 +54,5 @@ func EditHandler(c *gin.Context) {
 	e := new(Event)
 	c.BindJSON(&e)
 
-	var event = new(models.Incident)
-	event.Uid = c.Param("uid")
-	event.Title = e.Title
-	event.Describe = e.Describe
-	event.Deadline = e.Deadline
-	event.Edit()
-	c.JSON(http.StatusNoContent, nil)
+	Client.EditIncident(c.Param("uid"), e.Title, e.Describe, e.Deadline)
 }
