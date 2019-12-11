@@ -1,10 +1,11 @@
 package models
 
 import (
+	"time"
+
 	"cloud.google.com/go/datastore"
 	"github.com/gofrs/uuid"
 	"google.golang.org/api/iterator"
-	"time"
 )
 
 type Incident struct {
@@ -27,7 +28,6 @@ func (i *Incident) New() {
 // 新增事件
 func (d *Datastore) NewIncident(i *Incident) bool {
 	k := d.setDatastroeKey(i.Uid, new(Incident).TableName())
-
 	_, err := d.Conn.Put(d.Ctx, k, i)
 	if err != nil {
 		// TODO Handle error.
@@ -39,7 +39,7 @@ func (d *Datastore) NewIncident(i *Incident) bool {
 
 // 取得所有事件
 func (d *Datastore) AllIncident() []Incident {
-	query := datastore.NewQuery(new(Incident).TableName())
+	query := datastore.NewQuery(new(Incident).TableName()).Order("-CrateAt")
 	it := d.Conn.Run(d.Ctx, query)
 
 	var list []Incident
@@ -51,7 +51,6 @@ func (d *Datastore) AllIncident() []Incident {
 		} else if err != nil {
 			// TODO Handle error.
 		}
-
 		list = append(list, e)
 	}
 	return list
