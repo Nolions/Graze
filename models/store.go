@@ -46,6 +46,6 @@ func (d *Datastore) Client() {
 	}
 }
 
-func (d *Datastore)setDatastroeKey(v, entityName string) *datastore.Key {
+func (d *Datastore) setDatastroeKey(v, entityName string) *datastore.Key {
 	return datastore.NameKey(entityName, v, nil)
 }

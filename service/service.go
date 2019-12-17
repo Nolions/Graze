@@ -24,9 +24,9 @@ func Handler(router *gin.Engine) {
 	Client = (new(models.Datastore)).NewClient()
 
 	router.GET("/", ListHandler)
-	router.POST("/", incidentParams, CreatorHandler)
-	router.DELETE("/:uid", incidentUid, DeleteHandler)
-	router.PUT("/:uid", incidentUid, incidentParams, EditHandler)
+	router.POST("/", CreatorHandler)
+	router.DELETE("/:uid", DeleteHandler)
+	router.PUT("/:uid", EditHandler)
 }
 
 func Run(s *http.Server) {
