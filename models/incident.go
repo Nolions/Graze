@@ -20,11 +20,6 @@ func (i *Incident) TableName() string {
 	return "Incident"
 }
 
-func (i *Incident) New() {
-	i.Uid = uuid.Must(uuid.NewV4()).String()
-	i.CrateAt = time.Now()
-}
-
 // 新增事件
 func (d *Datastore) NewIncident(title, describe string, deadline time.Time) bool {
 	i := new(Incident)

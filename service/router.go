@@ -4,14 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"graze/models"
 	"net/http"
-	"time"
 )
-
-type Event struct {
-	models.Incident
-	Uid      string    `json:"uid"`
-	CreateAt time.Time `json:"create_at"`
-}
 
 var Client *models.Datastore
 
@@ -28,17 +21,10 @@ func ListHandler(c *gin.Context) {
 
 // 新增事件
 func CreatorHandler(c *gin.Context) {
-	e := new(Event)
-	c.BindJSON(&e)
-
 	i := new(models.Incident)
-	i.New()
-	i.Title = e.Title
-	i.Describe = e.Describe
-	i.Deadline = e.Deadline
+	c.BindJSON(&i)
 
-	Client.NewIncident(i)
-
+	Client.NewIncident(i.Title, i.Describe,  i.Deadline)
 	c.JSON(http.StatusNoContent, nil)
 }
 
@@ -51,9 +37,9 @@ func DeleteHandler(c *gin.Context) {
 
 // 編輯事件
 func EditHandler(c *gin.Context) {
-	e := new(Event)
-	c.BindJSON(&e)
+	i := new(models.Incident)
+	c.BindJSON(&i)
 
-	Client.EditIncident(c.Param("uid"), e.Title, e.Describe, e.Deadline)
+	Client.EditIncident(c.Param("uid"), i.Title, i.Describe, i.Deadline)
 	c.JSON(http.StatusNoContent, nil)
 }
