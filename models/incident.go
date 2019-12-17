@@ -10,8 +10,8 @@ import (
 
 type Incident struct {
 	Uid      string    `json:"uid"`
-	Title    string    `json:"title"`
-	Describe string    `json:"describe"`
+	Title    string    `json:"title" validate:"required"`
+	Describe string    `json:"describe" validate:"required"`
 	Deadline time.Time `json:"deadline"`
 	CrateAt  time.Time `json:"crate_at"`
 }
@@ -26,7 +26,14 @@ func (i *Incident) New() {
 }
 
 // 新增事件
-func (d *Datastore) NewIncident(i *Incident) bool {
+func (d *Datastore) NewIncident(title, describe string, deadline time.Time) bool {
+	i := new(Incident)
+	i.Uid = uuid.Must(uuid.NewV4()).String()
+	i.CrateAt = time.Now()
+	i.Title = title
+	i.Describe = describe
+	i.Deadline = deadline
+
 	k := d.setDatastroeKey(i.Uid, new(Incident).TableName())
 	_, err := d.Conn.Put(d.Ctx, k, i)
 	if err != nil {
