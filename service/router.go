@@ -2,11 +2,27 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
+	zh_location "github.com/go-playground/locales/zh"
+	"github.com/go-playground/universal-translator"
+	"gopkg.in/go-playground/validator.v9"
+	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
 	"graze/models"
 	"net/http"
 )
 
-var Client *models.Datastore
+var (
+	Client   *models.Datastore
+	trans    ut.Translator
+	validate *validator.Validate
+)
+
+func init() {
+	zh := zh_location.New()
+	uni := ut.New(zh, zh)
+	trans, _ = uni.GetTranslator("zh")
+	validate = validator.New()
+	zh_translations.RegisterDefaultTranslations(validate, trans)
+}
 
 // 所有事件
 func ListHandler(c *gin.Context) {
@@ -24,7 +40,16 @@ func CreatorHandler(c *gin.Context) {
 	i := new(models.Incident)
 	c.BindJSON(&i)
 
-	Client.NewIncident(i.Title, i.Describe,  i.Deadline)
+	err := validate.Struct(i)
+	if validate.Struct(i) != nil {
+		errors := FieldValidatorError(err, i.FieldTrans())
+		resp := ForumResp{}
+		resp.Error(http.StatusBadRequest, "validateError", errors)
+		c.JSON(500, resp)
+		return
+	}
+
+	Client.NewIncident(i.Title, i.Describe, i.Deadline)
 	c.JSON(http.StatusNoContent, nil)
 }
 
@@ -39,6 +64,15 @@ func DeleteHandler(c *gin.Context) {
 func EditHandler(c *gin.Context) {
 	i := new(models.Incident)
 	c.BindJSON(&i)
+
+	err := validate.Struct(i)
+	if err != nil {
+		errors := FieldValidatorError(err, i.FieldTrans())
+		resp := ForumResp{}
+		resp.Error(http.StatusBadRequest, "validateError", errors)
+		c.JSON(500, resp)
+		return
+	}
 
 	Client.EditIncident(c.Param("uid"), i.Title, i.Describe, i.Deadline)
 	c.JSON(http.StatusNoContent, nil)

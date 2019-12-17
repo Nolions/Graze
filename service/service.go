@@ -11,7 +11,7 @@ import (
 )
 
 func New(r *gin.Engine, addr string) *http.Server {
-	log.Printf("Listening on %s", addr)
+	log.Printf("Listening on http://localhost%s", addr)
 	return &http.Server{
 		Addr:         addr,
 		Handler:      r,

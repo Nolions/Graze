@@ -1,17 +1,16 @@
 package models
 
 import (
-	"time"
-
 	"cloud.google.com/go/datastore"
 	"github.com/gofrs/uuid"
 	"google.golang.org/api/iterator"
+	"time"
 )
 
 type Incident struct {
 	Uid      string    `json:"uid"`
-	Title    string    `json:"title" validate:"required"`
-	Describe string    `json:"describe" validate:"required"`
+	Title    string    `json:"title" validate:"required" validate:"required"`
+	Describe string    `json:"describe" validate:"required" validate:"required"`
 	Deadline time.Time `json:"deadline"`
 	CrateAt  time.Time `json:"crate_at"`
 }
@@ -90,4 +89,13 @@ func (d *Datastore) EditIncident(uid, title, describe string, deadline time.Time
 	}
 
 	return true
+}
+
+type ModelFieldTran map[string]string
+
+func (i Incident) FieldTrans() ModelFieldTran {
+	return ModelFieldTran{
+		"title":    "事件名稱",
+		"describe": "事件描述",
+	}
 }
