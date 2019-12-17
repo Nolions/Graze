@@ -95,7 +95,7 @@ type ModelFieldTran map[string]string
 
 func (i Incident) FieldTrans() ModelFieldTran {
 	return ModelFieldTran{
-		"title":    "事件名稱",
-		"describe": "事件描述",
+		"Title":    "事件名稱",
+		"Describe": "事件描述",
 	}
 }
