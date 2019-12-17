@@ -4,7 +4,7 @@ import (
 	"github.com/go-playground/locales/zh_Hant_TW"
 	ut "github.com/go-playground/universal-translator"
 	"gopkg.in/go-playground/validator.v9"
-	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
+	zh_tw_translations "gopkg.in/go-playground/validator.v9/translations/zh_tw"
 	"graze/models"
 	"strings"
 )
@@ -19,7 +19,7 @@ func init() {
 	uni := ut.New(zhTw)
 	trans, _ = uni.GetTranslator("zh_tw")
 	Validate = validator.New()
-	zh_translations.RegisterDefaultTranslations(Validate, trans)
+	zh_tw_translations.RegisterDefaultTranslations(Validate, trans)
 }
 
 type Errors interface {
@@ -49,7 +49,7 @@ func FieldValidatorError(err error, m models.ModelFieldTran) FieldErrorMsg {
 	for _, e := range errs {
 		transtr := e.Translate(trans)
 		f := strings.ToLower(e.Field())
-		
+
 		if rp, ok := m[e.Field()]; ok {
 			res[f] = strings.Replace(transtr, e.Field(), rp, 1)
 		} else {
