@@ -41,6 +41,11 @@ func dateTimeErrorTranslation(ut ut.Translator, fe validator.FieldError) string 
 
 // 驗證日期格式
 func TimeFormatValidator(fl validator.FieldLevel) bool {
+	fmt.Println(fl.Field().String())
+	if fl.Field().String() == "" {
+		return true // 沒有輸入值時，直接返回true
+	}
+
 	t := fmt.Sprint(fl.Field())
 	tt, err := time.Parse(time.RFC3339, t)
 	if err != nil || tt.IsZero() {
@@ -54,7 +59,6 @@ func FieldValidatorError(err error, m models.ModelFieldTran) FieldErrorMsg {
 	res := FieldErrorMsg{}
 	errs := err.(validator.ValidationErrors)
 	for _, e := range errs {
-
 		transtr := e.Translate(trans)
 		fmt.Println(transtr)
 		f := strings.ToLower(e.Field())
