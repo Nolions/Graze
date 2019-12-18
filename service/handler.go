@@ -42,8 +42,11 @@ func CreatorHandler(c *gin.Context) {
 // 刪除事件
 func DeleteHandler(c *gin.Context) {
 	Client.DeleteIncident(c.Param("uid"))
-
 	c.JSON(http.StatusNoContent, nil)
+}
+
+func MultiDeleteHandler(c *gin.Context)  {
+	
 }
 
 // 編輯事件
