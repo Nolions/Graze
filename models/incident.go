@@ -11,7 +11,7 @@ type Incident struct {
 	Uid      string    `json:"uid"`
 	Title    string    `json:"title" validate:"required" validate:"required"`
 	Describe string    `json:"describe" validate:"required" validate:"required"`
-	Deadline time.Time `json:"deadline"`
+	Deadline string `json:"deadline" validate:"datetime"`
 	CrateAt  time.Time `json:"crate_at"`
 }
 
@@ -20,7 +20,7 @@ func (i *Incident) TableName() string {
 }
 
 // 新增事件
-func (d *Datastore) NewIncident(title, describe string, deadline time.Time) bool {
+func (d *Datastore) NewIncident(title, describe, deadline string) bool {
 	i := new(Incident)
 	i.Uid = uuid.Must(uuid.NewV4()).String()
 	i.CrateAt = time.Now()
@@ -70,7 +70,7 @@ func (d *Datastore) DeleteIncident(uid string) bool {
 }
 
 // 編輯事件
-func (d *Datastore) EditIncident(uid, title, describe string, deadline time.Time) bool {
+func (d *Datastore) EditIncident(uid, title, describe, deadline string) bool {
 	k := d.setDatastroeKey(uid, new(Incident).TableName())
 
 	i := new(Incident)
@@ -97,5 +97,6 @@ func (i Incident) FieldTrans() ModelFieldTran {
 	return ModelFieldTran{
 		"Title":    "事件名稱",
 		"Describe": "事件描述",
+		"Deadline": "事件期限",
 	}
 }
