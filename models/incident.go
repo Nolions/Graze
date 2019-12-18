@@ -11,7 +11,7 @@ type Incident struct {
 	Uid      string    `json:"uid"`
 	Title    string    `json:"title" validate:"required" validate:"required"`
 	Describe string    `json:"describe" validate:"required" validate:"required"`
-	Deadline string `json:"deadline" validate:"datetime"`
+	Deadline string    `json:"deadline" validate:"datetime"`
 	CrateAt  time.Time `json:"crate_at"`
 }
 
@@ -61,6 +61,21 @@ func (d *Datastore) AllIncident() []Incident {
 func (d *Datastore) DeleteIncident(uid string) bool {
 	k := d.setDatastroeKey(uid, new(Incident).TableName())
 	err := d.Conn.Delete(d.Ctx, k)
+	if err != nil {
+		// TODO Handle error.
+		return false
+	}
+
+	return true
+}
+
+func (d *Datastore) MultiDeleteIncident(uids []string) bool {
+	var keys [] *datastore.Key
+	for _, uid := range uids {
+		k := d.setDatastroeKey(uid, new(Incident).TableName())
+		keys = append(keys, k)
+	}
+	err := d.Conn.DeleteMulti(d.Ctx, keys)
 	if err != nil {
 		// TODO Handle error.
 		return false

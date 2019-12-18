@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"graze/errors"
 	"graze/models"
@@ -45,8 +46,19 @@ func DeleteHandler(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// 批次刪除
 func MultiDeleteHandler(c *gin.Context)  {
-	
+	uids, ok := c.Request.URL.Query()["uid"]
+	if !ok || len(uids) <=0 {
+		// TODO Handle error.
+		c.JSON(http.StatusNoContent, nil)
+		return
+	}
+	fmt.Println(len(uids))
+	fmt.Println(uids[0])
+	fmt.Println(ok)
+	Client.MultiDeleteIncident(uids)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // 編輯事件
@@ -63,7 +75,6 @@ func EditHandler(c *gin.Context) {
 		c.JSON(500, resp)
 		return
 	}
-
 	Client.EditIncident(c.Param("uid"), i.Title, i.Describe, i.Deadline)
 	c.JSON(http.StatusNoContent, nil)
 }
