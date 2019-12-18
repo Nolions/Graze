@@ -25,8 +25,9 @@ func Handler(router *gin.Engine) {
 
 	router.GET("/", ListHandler)
 	router.POST("/", CreatorHandler)
-	router.DELETE("/:uid", DeleteHandler)
-	router.PUT("/:uid", EditHandler)
+	router.DELETE("/id/:uid", DeleteHandler)
+	router.DELETE("/multi", MultiDeleteHandler)
+	router.PUT("/id/:uid", EditHandler)
 }
 
 func Run(s *http.Server) {
