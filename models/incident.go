@@ -9,8 +9,8 @@ import (
 
 type Incident struct {
 	Uid      string    `json:"uid"`
-	Title    string    `json:"title" validate:"required" validate:"required"`
-	Describe string    `json:"describe" validate:"required" validate:"required"`
+	Title    string    `json:"title" validate:"required"`
+	Describe string    `json:"describe" validate:"required"`
 	Deadline string    `json:"deadline" validate:"datetime"`
 	CrateAt  time.Time `json:"crate_at"`
 }
