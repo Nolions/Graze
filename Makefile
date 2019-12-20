@@ -1,9 +1,9 @@
 ProjectID= web-todo-list
 Path=${PWD}
 
-# run & build
+# run API Server
 app-run:
-	go run cmd/main.go
+	go run cmd/api/main.go
 
 # Google App Engin
 
