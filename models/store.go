@@ -28,7 +28,7 @@ func (*Datastore) NewClient() *Datastore {
 // 建立Google Datastroe 連線
 func (d *Datastore) Client() {
 	d.Ctx = context.Background()
-	if config.Conf.Debug {
+	if config.APIConf.Debug {
 		o := []option.ClientOption{
 			option.WithEndpoint("localhost:8081"),
 			option.WithoutAuthentication(),
@@ -36,9 +36,9 @@ func (d *Datastore) Client() {
 			option.WithGRPCConnectionPool(50),
 		}
 
-		d.Conn, d.err = datastore.NewClient(d.Ctx, config.Conf.DatastoreProjectId, o...)
+		d.Conn, d.err = datastore.NewClient(d.Ctx, config.APIConf.DatastoreProjectId, o...)
 	} else {
-		d.Conn, d.err = datastore.NewClient(d.Ctx, config.Conf.DatastoreProjectId)
+		d.Conn, d.err = datastore.NewClient(d.Ctx, config.APIConf.DatastoreProjectId)
 	}
 
 	if d.err != nil {

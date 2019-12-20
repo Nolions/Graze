@@ -1,0 +1,10 @@
+runtime: go112
+main: ./cmd/cache
+env_variables:
+  APP_DEBUG: false
+
+service: cache
+
+handlers:
+- url: /.*
+  script: auto

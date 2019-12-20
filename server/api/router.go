@@ -1,6 +1,7 @@
-package service
+package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"graze/errors"
 	"graze/models"
@@ -9,8 +10,19 @@ import (
 
 var Client *models.Datastore
 
+func Router(router *gin.Engine) {
+	Client = (new(models.Datastore)).NewClient()
+
+	router.GET("/", ListHandler)
+	router.POST("/", CreatorHandler)
+	router.DELETE("/id/:uid", DeleteHandler)
+	router.DELETE("/multi", MultiDeleteHandler)
+	router.PUT("/id/:uid", EditHandler)
+}
+
 // 所有事件
 func ListHandler(c *gin.Context) {
+	fmt.Println("aaa")
 	list := Client.AllIncident()
 
 	if len(list) > 0 {

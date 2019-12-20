@@ -1,19 +1,25 @@
-ProjectID= web-todo-list
-Path=${PWD}
+## runServer
 
 # run API Server
 app-run:
 	go run cmd/api/main.go
 
-# Google App Engin
+# run Cache Server
+cache-run:
+	go run cmd/cache/main.go
 
-# run data store emulators
-gae-datastore:
-	gcloud beta emulators datastore  start --data-dir=${Path}
+ProjectID= web-todo-list
+Path=${PWD}
+
+## Google App Engin
 
 # Set ProjectID
 gae-set-ProjectID:
 	gcloud config set project ${ProjectID}
+
+# run datastore emulators
+gae-datastore:
+	gcloud beta emulators datastore  start --data-dir=${Path}
 
 # deploy to gcp gae
 gae-deploy:

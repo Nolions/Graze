@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"graze/config"
 	"graze/server"
-	"graze/server/api"
+	"graze/server/cache"
 	"log"
 	"net/http"
 	"os"
@@ -16,8 +16,11 @@ func main() {
 	config.Load()
 
 	e := server.Engine()
-	api.Router(e)
-	s := server.New(e, fmt.Sprintf(":%s", config.APIConf.Port))
+	cache.NewCacheHandler()
+	cache.Router(e)
+
+	s := server.New(e, fmt.Sprintf(":%s", config.CacheConf.Port))
+
 	go signalProcess(s)
 	server.Run(s)
 }
@@ -37,3 +40,4 @@ func signalProcess(srv *http.Server) {
 		return
 	}
 }
+

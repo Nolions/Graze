@@ -14,7 +14,10 @@ type AppConfig struct {
 	DatastoreHost      string
 }
 
-var Conf AppConfig
+var (
+	APIConf   AppConfig
+	CacheConf AppConfig
+)
 
 func init() {
 	err := godotenv.Load()
@@ -24,10 +27,13 @@ func init() {
 }
 
 func Load() {
-	Conf.Port = getEnv("APP_PORT", "8080")
-	Conf.Debug = getEnvBool("APP_DEBUG", false)
-	Conf.DatastoreProjectId = getEnv("DATASTORE_PROJECT_ID", "test-demo")
-	Conf.DatastoreHost = getEnv("DATASTORE_HOST", "http://localhost:8081")
+	APIConf.Port = getEnv("API_PORT", "8080")
+	APIConf.Debug = getEnvBool("API_DEBUG", false)
+	APIConf.DatastoreProjectId = getEnv("DATASTORE_PROJECT_ID", "test-demo")
+	APIConf.DatastoreHost = getEnv("DATASTORE_HOST", "http://localhost:8081")
+
+	CacheConf.Port = getEnv("CACHE_PORT", "8088")
+	CacheConf.Debug = getEnvBool("CACHE_DEBUG", false)
 }
 
 func getEnv(key, defaultVal string) string {
