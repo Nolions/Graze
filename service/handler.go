@@ -47,11 +47,7 @@ func CreatorHandler(c *gin.Context) {
 func DeleteHandler(c *gin.Context) {
 	_, resErr := Client.DeleteIncident(c.Param("uid"))
 	if resErr != nil {
-		resp := errors.ValidatorError{
-			Errors: errors.FieldValidatorError(err, i.FieldTrans()),
-		}
-		resp.Error()
-		c.JSON(http.StatusInternalServerError, resp)
+		c.JSON(http.StatusInternalServerError, resErr)
 		return
 	}
 
