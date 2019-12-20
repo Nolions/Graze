@@ -35,13 +35,26 @@ func CreatorHandler(c *gin.Context) {
 		return
 	}
 
-	Client.NewIncident(i.Title, i.Describe, i.Deadline)
+	_, respErr := Client.NewIncident(i.Title, i.Describe, i.Deadline)
+	if respErr != nil {
+		c.JSON(http.StatusInternalServerError, respErr)
+		return
+	}
 	c.JSON(http.StatusNoContent, nil)
 }
 
 // 刪除事件
 func DeleteHandler(c *gin.Context) {
-	Client.DeleteIncident(c.Param("uid"))
+	_, resErr := Client.DeleteIncident(c.Param("uid"))
+	if resErr != nil {
+		resp := errors.ValidatorError{
+			Errors: errors.FieldValidatorError(err, i.FieldTrans()),
+		}
+		resp.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
 	c.JSON(http.StatusNoContent, nil)
 }
 
@@ -74,9 +87,14 @@ func EditHandler(c *gin.Context) {
 			Errors: errors.FieldValidatorError(err, i.FieldTrans()),
 		}
 		resp.Error()
-		c.JSON(500, resp)
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-	Client.EditIncident(c.Param("uid"), i.Title, i.Describe, i.Deadline)
+
+	_, respErr := Client.EditIncident(c.Param("uid"), i.Title, i.Describe, i.Deadline)
+	if respErr != nil {
+		c.JSON(http.StatusInternalServerError, respErr)
+		return
+	}
 	c.JSON(http.StatusNoContent, nil)
 }

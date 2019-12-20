@@ -6,12 +6,13 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"gopkg.in/go-playground/validator.v9"
 	"gopkg.in/go-playground/validator.v9/translations/zh_tw"
-	"graze/models"
 	"strings"
 	"time"
 )
 
 type FieldErrorMsg map[string]interface{}
+
+type ModelFieldTran map[string]string
 
 var (
 	trans    ut.Translator
@@ -54,7 +55,7 @@ func TimeFormatValidator(fl validator.FieldLevel) bool {
 	return true
 }
 
-func FieldValidatorError(err error, m models.ModelFieldTran) FieldErrorMsg {
+func FieldValidatorError(err error, m ModelFieldTran) FieldErrorMsg {
 	res := FieldErrorMsg{}
 	errs := err.(validator.ValidationErrors)
 	for _, e := range errs {
@@ -71,6 +72,7 @@ func FieldValidatorError(err error, m models.ModelFieldTran) FieldErrorMsg {
 	return res
 }
 
+// 欄位驗證錯誤訊息結構
 type ValidatorError struct {
 	Err
 	Errors FieldErrorMsg `json:"errors"`
